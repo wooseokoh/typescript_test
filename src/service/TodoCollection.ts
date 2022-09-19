@@ -1,12 +1,11 @@
-import TodoItem from "./TodoItem";
-
+import TodoItem from "../model/TodoItem";
 
 class TodoCollection {
-    private nextId : number =1;
+    private nextId : number = 1;
 
     private itemMap : Map<number, TodoItem>;
 
-    constructor(public userName: string, public todoItems:TodoItem[] = []){
+    constructor(public userName: string, todoItems:TodoItem[] = []){
         this.itemMap = new Map<number, TodoItem>();
         todoItems.forEach((item) => this.itemMap.set(item.id, item));
     }
@@ -28,7 +27,7 @@ class TodoCollection {
     getTodoItems(includeComplete: boolean): TodoItem[]{
         return [...this.itemMap.values()].filter(
             (item) => includeComplete || !item.complete
-        )
+        );
     }
 
     removeComplete():void{
@@ -37,6 +36,14 @@ class TodoCollection {
                 this.itemMap.delete(item.id);
             }
         })
+    }
+
+    // getItemCounts() : {total : number, incomplete : number}{
+    getItemCounts() : ItemCounts{
+        return {
+            total : this.itemMap.size,
+            incomplete : this.getTodoItems(false).length
+        }
     }
 
     markComplete(id : number, complete: boolean) : void {
