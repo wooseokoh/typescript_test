@@ -7,7 +7,10 @@ import TodoCollection from '../service/TodoCollection';
 class TodoConsole {
     private todoCollection : TodoCollection;
 
+    private showCompleted : boolean;
+
     constructor(){
+        this.showCompleted = true;
         const sampleTodos: TodoItem[] = data.map(
             (item) => new TodoItem(item.id, item.task, item.complete)
         );
@@ -15,15 +18,17 @@ class TodoConsole {
         this.todoCollection = new TodoCollection('My Todo List', sampleTodos);
     }
 
-    displayTodoList():void{
+    displayTodoList() : void{
         console.log(
             `====${this.todoCollection.userName}====` + 
             `(${this.todoCollection.getItemCounts().incomplete} items todo)`
         )
-        this.todoCollection.getTodoItems(true).forEach((item) => item.printDetails());
+        this.todoCollection
+            .getTodoItems(this.showCompleted)
+            .forEach((item) => item.printDetails());
     }
 
-    promptUser():void{
+    promptUser() : void{
         console.clear();
         this.displayTodoList();
 
@@ -33,11 +38,31 @@ class TodoConsole {
             message:'Choose option',
             choices: Object.values(Commnads),
         }).then((answers) => {
-            if(answers['command'] !== Commnads.Quit){
-                this.promptUser();
+            switch(answers['command']){
+                case Commnads.Toggle:
+                    this.showCompleted = !this.showCompleted;
+                    this.promptUser();
+                    break;
+                case Commnads.Add:
+                    this.promptAdd();
+                    break;
             }
         });
     }
+
+    promptAdd() : void {
+        console.clear();
+        inquirer.prompt({
+            type:'input',
+            name:'add',
+            message:'Enter task :'
+        }).then((answers) => {
+            if(answers['add'] !== ""){
+                this.todoCollection.addTodo(answers['add']);
+            }
+            this.promptUser();
+        })
+    };
 }
 
 export default TodoConsole;

@@ -1,4 +1,5 @@
 export enum Commnads{
     Quit = 'Quit',
-    Add = 'Add',
+    Toggle = 'Show/Hide Completed',
+    Add = 'Add New Task',
 }

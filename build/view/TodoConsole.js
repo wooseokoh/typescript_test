@@ -33,13 +33,16 @@ const TodoItem_1 = __importDefault(require("../model/TodoItem"));
 const TodoCollection_1 = __importDefault(require("../service/TodoCollection"));
 class TodoConsole {
     constructor() {
+        this.showCompleted = true;
         const sampleTodos = data_1.data.map((item) => new TodoItem_1.default(item.id, item.task, item.complete));
         this.todoCollection = new TodoCollection_1.default('My Todo List', sampleTodos);
     }
     displayTodoList() {
         console.log(`====${this.todoCollection.userName}====` +
             `(${this.todoCollection.getItemCounts().incomplete} items todo)`);
-        this.todoCollection.getTodoItems(true).forEach((item) => item.printDetails());
+        this.todoCollection
+            .getTodoItems(this.showCompleted)
+            .forEach((item) => item.printDetails());
     }
     promptUser() {
         console.clear();
@@ -50,10 +53,30 @@ class TodoConsole {
             message: 'Choose option',
             choices: Object.values(Commands_1.Commnads),
         }).then((answers) => {
-            if (answers['command'] !== Commands_1.Commnads.Quit) {
-                this.promptUser();
+            switch (answers['command']) {
+                case Commands_1.Commnads.Toggle:
+                    this.showCompleted = !this.showCompleted;
+                    this.promptUser();
+                    break;
+                case Commands_1.Commnads.Add:
+                    this.promptAdd();
+                    break;
             }
         });
     }
+    promptAdd() {
+        console.clear();
+        inquirer.prompt({
+            type: 'input',
+            name: 'add',
+            message: 'Enter task :'
+        }).then((answers) => {
+            if (answers['add'] !== "") {
+                this.todoCollection.addTodo(answers['add']);
+            }
+            this.promptUser();
+        });
+    }
+    ;
 }
 exports.default = TodoConsole;
